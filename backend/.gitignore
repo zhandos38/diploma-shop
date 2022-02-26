@@ -1,0 +1,7 @@
+.idea
+dist
+config
+node_modules
+/routes/files/*
+
+config/config.json
