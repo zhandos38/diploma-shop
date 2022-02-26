@@ -2,16 +2,17 @@ import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-
-import BalmUI from "balm-ui"; // Official Google Material Components
-import BalmUIPlus from "balm-ui-plus"; // BalmJS Team Material Components
-import "balm-ui-css";
+import PrimeVue from "primevue/config";
+import Button from "primevue/button";
+import Card from "primevue/card";
 
 const app = createApp(App);
 
-app.use(BalmUI);
-app.use(BalmUIPlus);
 app.use(store);
 app.use(router);
+app.use(PrimeVue);
+
+app.component("Button", Button);
+app.component("Card", Card);
 
 app.mount("#app");
