@@ -30,7 +30,7 @@ app.use("/user", routeUser);
 app.use("/product", routeProduct);
 app.use("/category", routeCategory);
 app.use("/order", routeOrder);
-app.use(express.static(path.join(__dirname, "routes", "file")));
+app.use(express.static(path.join(__dirname, "routes", "files")));
 
 const server = http.createServer(app);
 

@@ -22,15 +22,6 @@ module.exports = {
         allowNull: false,
         defaultValue: 0,
       },
-      shiftId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: {
-            tableName: "Shift"
-          },
-        },
-        allowNull: false,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

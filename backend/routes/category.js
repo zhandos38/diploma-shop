@@ -44,17 +44,8 @@ router.get("/data-provider", authenticateJWT, (req, res) => {
 });
 
 router.get("/index", authenticateJWT, async (req, res) => {
-  let where = null;
-  if (req.query.type) {
-    where = {
-      type: req.query.type,
-    };
-  }
-
   try {
-    const models = await Category.findAll({
-      where: where,
-    });
+    const models = await Category.findAll();
 
     res.status("200").send(models);
   } catch (err) {

@@ -22,10 +22,6 @@ module.exports = {
           key: "id",
         },
       },
-      type: {
-        type: Sequelize.TINYINT,
-        allowNull: false,
-      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

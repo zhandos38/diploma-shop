@@ -1,10 +1,21 @@
 const express = require("express"),
-    router = express.Router(),
-    fs = require("fs"),
-    { Product, Category, ProductComponent, Workshop, sequelize } = require("../models/index"),
-    { getPagination, getPagingData, getFilterQuery, getSortQuery } = require("../functions"),
-    { Op } = require("sequelize");
-const {authenticateJWT} = require("../middleware");
+  router = express.Router(),
+  fs = require("fs"),
+  {
+    Product,
+    Category,
+    ProductComponent,
+    Workshop,
+    sequelize,
+  } = require("../models/index"),
+  {
+    getPagination,
+    getPagingData,
+    getFilterQuery,
+    getSortQuery,
+  } = require("../functions"),
+  { Op } = require("sequelize");
+const { authenticateJWT } = require("../middleware");
 
 router.get("/data-provider", authenticateJWT, (req, res) => {
   try {
@@ -19,20 +30,20 @@ router.get("/data-provider", authenticateJWT, (req, res) => {
       offset,
       include: {
         model: Category,
-        as: 'Category'
+        as: "Category",
       },
       where: {
-        [Op.and]: whereQuery
+        [Op.and]: whereQuery,
       },
-      order: sortQuery
+      order: sortQuery,
     })
-        .then(data => {
-          const response = getPagingData(data, page, limit);
-          res.status("200").send(response);
-        })
-        .catch(err => {
-          res.send("error: " + err);
-        });
+      .then((data) => {
+        const response = getPagingData(data, page, limit);
+        res.status("200").send(response);
+      })
+      .catch((err) => {
+        res.send("error: " + err);
+      });
   } catch (err) {
     res.status("500").send("error: " + err);
   }
@@ -47,13 +58,13 @@ router.get("/index", authenticateJWT, async (req, res) => {
     }
 
     whereQuery = {
-      [Op.or]: types
-    }
+      [Op.or]: types,
+    };
   }
 
   try {
     const models = await Product.findAll({
-      where: whereQuery
+      where: whereQuery,
     });
 
     res.status("200").send(models);
@@ -67,11 +78,11 @@ router.get("/get-by-id?:id", authenticateJWT, async (req, res) => {
     const model = await Product.findOne({
       include: {
         model: ProductComponent,
-        as: "Component"
+        as: "Component",
       },
       where: {
         id: req.query.id,
-      }
+      },
     });
 
     res.status("200").send(model);
@@ -84,12 +95,15 @@ router.post("/create", authenticateJWT, async (req, res) => {
   const { productComponents } = req.body;
 
   try {
-    await sequelize.transaction(async t => {
+    await sequelize.transaction(async (t) => {
       const model = await Product.create(req.body, {
-        transaction: t
+        transaction: t,
       });
 
-      if (typeof productComponents !== "undefined" && productComponents !== null) {
+      if (
+        typeof productComponents !== "undefined" &&
+        productComponents !== null
+      ) {
         for (const item of productComponents) {
           await model.createComponent(item, { transaction: t });
         }
@@ -107,40 +121,43 @@ router.put("/update?:id", authenticateJWT, async (req, res) => {
   const id = req.query.id;
 
   try {
-    await sequelize.transaction(async t => {
+    await sequelize.transaction(async (t) => {
       const model = await Product.findOne({
         where: {
-          id: id
+          id: id,
         },
-        transaction: t
+        transaction: t,
       });
 
       if (!model) {
         throw new Error("Product is not found!");
       }
 
-      if (typeof productComponents !== "undefined" && productComponents !== null) {
+      if (
+        typeof productComponents !== "undefined" &&
+        productComponents !== null
+      ) {
         for (const item of productComponents) {
           const productComponent = await ProductComponent.findOne({
             where: {
-              id: item.id
+              id: item.id,
             },
-            transaction: t
+            transaction: t,
           });
 
           if (productComponent) {
-            await productComponent.update(item,{ transaction: t });
+            await productComponent.update(item, { transaction: t });
           } else {
             await model.createComponent(item, { transaction: t });
           }
         }
       }
 
-      if (model.img && (model.img !== req.body.data.img)) {
-        fs.unlinkSync(  `${__dirname}/file/${model.img}`);
+      if (model.img && model.img !== req.body.data.img) {
+        fs.unlinkSync(`${__dirname}/files/${model.img}`);
       }
 
-      await model.update(req.body.data,{ transaction: t });
+      await model.update(req.body.data, { transaction: t });
     });
 
     res.status("200").send("Ok");
@@ -155,12 +172,12 @@ router.delete("/delete?:id", authenticateJWT, async (req, res) => {
   try {
     const model = await Product.findOne({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
 
     if (model.img) {
-      fs.unlinkSync(`${__dirname}/file/${model.img}`);
+      fs.unlinkSync(`${__dirname}/files/${model.img}`);
     }
 
     await model.destroy();
@@ -177,8 +194,8 @@ router.delete("/component-delete?:id", authenticateJWT, async (req, res) => {
   try {
     await ProductComponent.destroy({
       where: {
-        id: id
-      }
+        id: id,
+      },
     });
 
     res.status("200").send("Ok");
@@ -187,18 +204,18 @@ router.delete("/component-delete?:id", authenticateJWT, async (req, res) => {
   }
 });
 
-router.post("/upload", authenticateJWT, async (req, res) => {
+router.post("/upload", async (req, res) => {
   let file;
   let uploadPath;
 
   if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('No files were uploaded.');
+    return res.status(400).send("No files were uploaded.");
   }
 
   file = req.files.img;
-  uploadPath = __dirname + '/file/' + file.name;
+  uploadPath = __dirname + "/files/" + file.name;
 
-  await file.mv(uploadPath, function(err) {
+  await file.mv(uploadPath, function (err) {
     if (err) {
       return res.status(500).send(err);
     }
@@ -207,9 +224,9 @@ router.post("/upload", authenticateJWT, async (req, res) => {
   res.status(200).send("Ok");
 });
 
-router.get('/download', authenticateJWT, function(req, res){
+router.get("/download", authenticateJWT, function (req, res) {
   const { fileName } = req.query;
-  const file = `${__dirname}/file/${fileName}`;
+  const file = `${__dirname}/files/${fileName}`;
   res.download(file);
 });
 
@@ -222,15 +239,15 @@ router.get("/get-by-category?:id", authenticateJWT, async (req, res) => {
     }
 
     whereQuery = {
-      [Op.or]: types
-    }
+      [Op.or]: types,
+    };
   }
 
   let categoryId = req.query.id;
   let whereCategory = categoryId;
-  if (categoryId === 'null') {
+  if (categoryId === "null") {
     whereCategory = {
-      [Op.is]: null
+      [Op.is]: null,
     };
   }
 
@@ -242,7 +259,7 @@ router.get("/get-by-category?:id", authenticateJWT, async (req, res) => {
       where: {
         categoryId: whereCategory,
         [Op.and]: whereQuery,
-      }
+      },
     });
 
     res.status(200).send(products);

@@ -1,6 +1,5 @@
 const { Order, OrderItems, Product, Category, User, Settings, Invoice, InvoiceItems, Shift, CashboxTransactions, OrderReturn, OrderReturnItems, Customer, sequelize } = require("./models/index");
 const axios = require("axios");
-const checkInternetConnected = require('check-internet-connected');
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 
