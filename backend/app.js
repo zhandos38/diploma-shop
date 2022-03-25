@@ -3,11 +3,8 @@ const express = require("express"),
   path = require("path"),
   bodyParser = require("body-parser"),
   fileUpload = require("express-fileupload"),
-  http = require("http");
-
-require("dotenv").config();
-
-const { PORT } = process.env;
+  http = require("http"),
+  config = require("./config");
 
 // routers
 const routeAuth = require("./routes/auth");
@@ -17,7 +14,6 @@ const routeCategory = require("./routes/category");
 const routeOrder = require("./routes/order");
 
 const app = express();
-const port = PORT;
 
 // use the modules
 app.use(cors());
@@ -35,6 +31,6 @@ app.use(express.static(path.join(__dirname, "routes", "files")));
 const server = http.createServer(app);
 
 // starting the server
-server.listen(port, "0.0.0.0", async () => {
-  console.log(`Server started, listening port: ${port}`);
+server.listen(config.PORT, config.HOST, async () => {
+  console.log(`Server started, listening port: ${config.PORT} on ${config.HOST}`);
 });

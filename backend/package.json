@@ -4,8 +4,9 @@
   "description": "IMS cafe server",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "set NODE_ENV=development&& node app.js",
+    "watch": "set NODE_ENV=development&& nodemon app.js",
+    "prod": "set NODE_ENV=production&& node app.js"
   },
   "repository": "https://github.com/zhandos38/ims-server",
   "author": "GitHub",
